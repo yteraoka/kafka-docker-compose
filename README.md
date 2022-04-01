@@ -77,6 +77,17 @@ docker exec -it kafka-docker-compose-client-1 bash
   --print-metrics
 ```
 
+### 別の consumer
+
+```
+/opt/bitnami/kafka/bin/kafka-console-consumer.sh \
+  --bootstrap-server kafka-0:9092 \
+  --property print.timestamp=true \
+  --property print.partition=true \
+  --group group1 \
+  --topic test1
+```
+
 ### Topic の状態確認
 
 ```
