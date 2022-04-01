@@ -91,6 +91,8 @@ services:
       - zookeeper
   client:
     image: docker.io/bitnami/kafka:2.8
+    ports:
+      - "8080"
     entrypoint:
       - /bin/bash
       - -c

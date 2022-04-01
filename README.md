@@ -47,9 +47,9 @@ docker exec -it kafka-docker-compose-client-1 bash
 ```
 /opt/bitnami/kafka/bin/kafka-topics.sh \
   --bootstrap-server kafka-0:9092 \
-  --create --topic test1 \
   --partitions 10 \
-  --replication-factor 3
+  --replication-factor 3 \
+  --create --topic test1
 ```
 
 ### consumer を起動
@@ -142,6 +142,7 @@ for d in sarama/tools/kafka-*; do
   fi
 done
 (cd sarama/examples/consumergroup && GOOS=linux GOARCH=amd64 go build && docker cp consumer kafka-docker-compose-client-1:/tmp/)
+(cd sarama/examples/http_server && GOOS=linux GOARCH=amd64 go build && docker cp http_server kafka-docker-compose-client-1:/tmp/)
 ```
 
 ### consumer
@@ -179,3 +180,22 @@ ConsumerGroup を使う
 ```
 
 - `-partition` 指定が必須
+
+### http_server
+
+HTTP サーバーがアクセスログを Kafka に送る
+
+```
+/tmp/http_server -brokers kafka-1:9092
+```
+
+```
+curl http://localhost:8080/
+curl http://localhost:8080/test123
+```
+
+access_log という Topic と important という Topic に送られる
+
+全てのアクセスが access_log に送られ、`/` へのアクセスだけが
+query_string を Value として important Topic にも送られる
+
