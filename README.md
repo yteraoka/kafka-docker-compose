@@ -33,13 +33,13 @@ docker compose up -d
 
 ```
 docker compose down
-docker volume rm kafka-docker-compose_kafka_{0,1,2,3}_data kafka-docker-compose_zookeeper_data
+docker volume ls --format '{{.Name}}' | egrep 'kafka|zookeeper' | xargs docker volume rm
 ```
 
 ## テスト
 
 ```
-docker exec -it kafka-docker-compose-client-1 bash
+docker compose exec client bash
 ```
 
 ### Topic 作成
@@ -149,12 +149,13 @@ git clone https://github.com/Shopify/sarama.git
 for d in sarama/tools/kafka-*; do
   if [ -d "$d" ]; then
     name=$(basename $d)
-    (cd $d && GOOS=linux GOARCH=amd64 go build && docker cp $name kafka-docker-compose-client-1:/tmp/)
+    (cd $d && GOOS=linux GOARCH=amd64 go build) && docker compose cp $d/$name client:/tmp/
   fi
 done
-(cd sarama/examples/consumergroup && GOOS=linux GOARCH=amd64 go build && docker cp consumer kafka-docker-compose-client-1:/tmp/)
-(cd sarama/examples/http_server && GOOS=linux GOARCH=amd64 go build && docker cp http_server kafka-docker-compose-client-1:/tmp/)
+(cd sarama/examples/consumergroup && go mod tidy && GOOS=linux GOARCH=amd64 go build) && docker compose cp sarama/examples/consumergroup/consumer client:/tmp/
+(cd sarama/examples/http_server && GOOS=linux GOARCH=amd64 go build) && docker compose cp sarama/examples/http_server/http_server client:/tmp/
 ```
+
 
 ### consumer
 
